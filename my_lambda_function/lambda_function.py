@@ -19,22 +19,22 @@ def lambda_handler(event, context):
     image = Image.open(BytesIO(image_content))
     
     # Resize image
-    image = image.resize((128, 128))  # Resize to 128x128
+    image = image.resize((512, 512))  # Resize to 512X512
     
     # Save to bytes buffer
     buffer = BytesIO()
-    image.save(buffer, format=JPEG)
+    image.save(buffer, format="JPEG")
     buffer.seek(0)
     
     # Upload to destination bucket
-    destination_bucket = 'destination-bucket-name'
-    new_key = fresized-{key}
+    destination_bucket = 'destination-buckett2025'
+    new_key = f"resized-{key}"
     
     s3.put_object(
         Bucket=destination_bucket,
         Key=new_key,
         Body=buffer,
-        ContentType='image/jpeg'
+        ContentType='image/jpg'
     )
 
     return {
