@@ -1,42 +1,46 @@
 📸 AWS Lambda Image Resizer
-This project automatically resizes images uploaded to an Amazon S3 bucket using an AWS Lambda function written in Python. When a new image is uploaded to the source bucket, the Lambda function resizes it (e.g., to 128×128 pixels) and saves the result to a destination S3 bucket.
+Automatically resize images uploaded to an Amazon S3 bucket using an AWS Lambda function written in Python.
+
+When an image is uploaded to the source bucket, the Lambda function:
+
+Resizes it (e.g., to 128×128 pixels)
+
+Saves it to a destination S3 bucket with a resized- prefix
 
 🚀 How It Works
-An image is uploaded to the source S3 bucket.
+📤 Upload an image to the source S3 bucket
 
-An S3 event triggers a Lambda function.
+⚡ S3 triggers the Lambda function
 
-The function:
+🐍 Lambda function:
 
 Downloads the image
 
 Resizes it using Pillow
 
-Uploads it to a destination S3 bucket
+Uploads it to the destination S3 bucket
 
-The resized image is saved with a resized- prefix
-
+Adds the prefix resized- to the filename
 
 🛠️ Technologies Used
-AWS Lambda
+🟨 AWS Lambda
 
-Amazon S3
+📦 Amazon S3
 
-IAM Roles & Policies
+🔐 IAM Roles & Policies
 
-Python 3.9
+🐍 Python 3.9
 
-Pillow (via Lambda Layer)
-
+🖼️ Pillow (via Lambda Layer)
 
 📋 Setup Instructions
 1️⃣ Create S3 Buckets
-Create a source bucket (e.g., image-upload-source)
+Source bucket: image-upload-source
 
-Create a destination bucket (e.g., image-upload-resized)
+Destination bucket: image-upload-resized
 
 2️⃣ Create IAM Role for Lambda
-Attach the following inline policy to a new IAM role:
+Attach the following inline policy:
 
 {
   "Version": "2012-10-17",
@@ -54,27 +58,26 @@ Attach the following inline policy to a new IAM role:
     }
   ]
 }
-3️⃣ Create Lambda Function
+3️⃣ Create the Lambda Function
 Runtime: Python 3.9
 
-Attach the IAM role created above
+Memory: 512 MB
 
-Set memory: 512 MB
+Timeout: 30 seconds
 
-Set timeout: 30 seconds
+Role: Attach the IAM role created above
 
 4️⃣ Add Pillow Layer
-Add this Lambda layer ARN (for eu-north-1, adjust region if needed):
+Use this Lambda Layer ARN for Pillow (region: eu-north-1):
 
 arn:aws:lambda:eu-north-1:770693421928:layer:Klayers-p39-Pillow:9
-Also attach the following Lambda resource policy to allow the layer:
+Attach this resource-based policy to allow the Lambda function to access the layer:
 
 {
   "Effect": "Allow",
   "Action": "lambda:GetLayerVersion",
   "Resource": "arn:aws:lambda:eu-north-1:770693421928:layer:Klayers-p39-Pillow:9"
 }
-
 5️⃣ Upload Lambda Code
 Create a function.zip with the following lambda_function.py inside:
 
@@ -104,39 +107,31 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': f'Resized image uploaded as {new_key}'
     }
-Upload this ZIP file to your Lambda function via the AWS Console.
+📥 Upload function.zip to the Lambda function using the AWS Console.
 
-6️⃣ Set S3 Trigger
-Go to your source S3 bucket:
+6️⃣ Set Up S3 Trigger
+Go to your source bucket
 
-Click Properties
+Navigate to Properties → Event notifications
 
-Scroll to Event notifications
+Create a new event:
 
-Create an event:
+Event type: PUT
 
-Trigger on PUT events
-
-Destination: your Lambda function
+Destination: Your Lambda function
 
 7️⃣ Allow S3 to Invoke Lambda
-Add this resource-based policy to your Lambda:
+Add a resource-based policy to your Lambda function:
 
-Go to Configuration > Permissions > Add permissions
+Go to: Configuration → Permissions → Add permissions
 
 Select:
 
-Principal: AWS service → S3
+Principal: AWS Service → S3
 
 Action: lambda:InvokeFunction
 
 Source ARN: arn:aws:s3:::image-upload-source
 
-✅ Done!
-Now, when you upload an image to your source bucket, a resized version will automatically appear in the destination bucket!
-
-
-
-
-
-
+✅ You're All Set!
+Now whenever you upload an image to image-upload-source, 🎉 a resized version will automatically appear in image-upload-resized!
